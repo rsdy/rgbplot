@@ -14,14 +14,14 @@ class Widget < Qt::Widget
 
   def paintEvent(e)
     x = Start
-    fstep = 0.5
-    pstep = (width / ((End - Start) / fstep)).ceil;
+    fstep = (End - Start) / width.to_f
 
+    puts fstep
     painter = Qt::Painter.new self
 
-    (0...width).step pstep do |i|
+    (0...width).each do |i|
       painter.pen = Qt::Pen.new { |p|
-        p.width = pstep;
+        p.width = 1;
         p.color = Qt::Color.new rf(x), gf(x), bf(x)
       }
       painter.drawLine i, 0, i, height - 1
