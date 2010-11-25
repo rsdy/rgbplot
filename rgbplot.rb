@@ -20,6 +20,8 @@ class RGBPlot < Qt::Widget
 
       x += fstep
     end
+
+    painter.end
   end
 
   def initialize(from, to, parent = nil)
