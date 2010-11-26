@@ -25,34 +25,28 @@
 require 'rubygems'
 require 'Qt4'
 
-
 class RGBPlot < Qt::Widget
   def paintEvent(e)
-    x = @from
-    fstep = (@to - @from) / width.to_f
-
     painter = Qt::Painter.new self
+    x = @value_range.step((@value_range.count - 1) / width.to_f).to_a
 
     (0...width).each do |i|
       painter.pen = Qt::Pen.new { |p|
         p.width = 1;
-        p.color = Qt::Color.new red[x], green[x], blue[x]
+        p.color = Qt::Color.new red[x[i]], green[x[i]], blue[x[i]]
       }
       painter.drawLine i, 0, i, height - 1
-
-      x += fstep
     end
 
     painter.end
   end
 
-  def initialize(from, to, parent = nil)
+  def initialize(value_range, parent = nil)
     super parent
 
-    @from = from
-    @to   = to
+    @value_range = value_range
   end
 
-  attr_accessor :red, :green, :blue
+  attr_accessor :red, :green, :blue, :value_range
 end
 

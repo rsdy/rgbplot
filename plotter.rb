@@ -25,8 +25,9 @@
 require 'rgbplot'
 
 app = Qt::Application.new(ARGV)
+
 window = Qt::MainWindow.new do |w|
-  widget = RGBPlot.new -10, 45
+  widget = RGBPlot.new (-10..45)
 
   widget.red   = lambda { |x| 128 + 128 * Math.sin(x + 10) }
   widget.green = lambda { |x| 128 + 128 * Math.sin((x + 10)/10) }
@@ -37,3 +38,4 @@ end
 
 window.show
 app.exec
+
