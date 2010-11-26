@@ -45,6 +45,7 @@ class RGBPlot < Qt::Widget
     super parent
 
     @value_range = value_range
+    self.minimumHeight = 50
   end
 
   attr_accessor :red, :green, :blue, :value_range

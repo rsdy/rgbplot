@@ -24,18 +24,75 @@
 #
 require 'rgbplot'
 
-app = Qt::Application.new(ARGV)
+class MainWindow < Qt::Dialog
+  def change_function to_change, val
+     begin
+       f = eval ' lambda { |x| ' + val + ' } '
+       @plotter.send to_change, f
+       @plotter.repaint
+     rescue SyntaxError
+       # do nothing here, just omit
+     end
+  end
 
-window = Qt::MainWindow.new do |w|
-  widget = RGBPlot.new (-10..45)
+  def create_function_group
+    Qt::GroupBox.new(self) do |gb|
+      gb.title = 'Functions'
 
-  widget.red   = lambda { |x| 128 + 128 * Math.sin(x + 10) }
-  widget.green = lambda { |x| 128 + 128 * Math.sin((x + 10)/10) }
-  widget.blue  = lambda { |x| 128 + 128 * Math.sin((x + 10)/2) }
+      @red   = Qt::LineEdit.new self
+      @red.connect(SIGNAL('textChanged(QString)')) do |val|
+        change_function :red=, val
+      end
 
-  w.centralWidget = widget
+      @green = Qt::LineEdit.new self
+      @green.connect(SIGNAL('textChanged(QString)')) do |val|
+        change_function :green=, val
+      end
+
+      @blue  = Qt::LineEdit.new self
+      @blue.connect(SIGNAL('textChanged(QString)')) do |val|
+        change_function :blue=, val
+      end
+
+      gb.layout = Qt::FormLayout.new
+      gb.layout.addRow 'Red',   @red
+      gb.layout.addRow 'Green', @green
+      gb.layout.addRow 'Blue',  @blue
+    end
+  end
+
+  def create_layout
+    self.layout = Qt::VBoxLayout.new do |layout|
+      @plotter = RGBPlot.new ARGV[0].to_i..ARGV[1].to_i, self
+
+      layout.addWidget @plotter, 1
+      layout.addWidget create_function_group
+
+      @red.text   = 'x % 255'
+      @green.text = '(2*x) % 255'
+      @blue.text  = '(5*x) % 255'
+    end
+  end
+
+  def initialize(parent = nil)
+    super parent
+
+    create_layout
+  end
 end
 
+if(ARGV.length < 2) then
+  print %{
+    usage: ./plotter.rb min max
+  }
+
+  exit 1
+end
+
+app = Qt::Application.new(ARGV)
+window = MainWindow.new
+window.minimumWidth = 483 # of course it is golden ratio
+window.minimumHeight = 300
 window.show
 app.exec
 
